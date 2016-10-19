@@ -48,17 +48,17 @@ global $twentyseventeencounter;
 				<?php
 					/* translators: %s: Name of current post */
 					the_content( sprintf(
-						__( 'Continue reading %s', 'twentyseventeen' ),
-						the_title( '<span class="screen-reader-text">"', '"</span>', false )
+						__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
+						get_the_title()
 					) );
 				?>
 			</div><!-- .entry-content -->
 
 			<?php
-			// Show recent blog posts if is blog posts page (Note that get_option returns a string, so we're casting the result as an int)
+			// Show recent blog posts if is blog posts page (Note that get_option returns a string, so we're casting the result as an int).
 			if ( get_the_ID() === (int) get_option( 'page_for_posts' )  ) : ?>
 
-				<?php // Show four most recent posts
+				<?php // Show four most recent posts.
 				$recent_posts = new WP_Query( array(
 					'posts_per_page'      => 3,
 					'post_status'         => 'publish',

@@ -13,7 +13,7 @@
  */
 
 ?><!DOCTYPE html>
-<html <?php language_attributes(); ?> class="no-js">
+<html <?php language_attributes(); ?> class="no-js no-svg">
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,16 +30,18 @@
 
 		<?php get_template_part( 'components/header/header', 'image' ); ?>
 
-		<div class="navigation-top">
-			<div class="wrap">
-				<?php get_template_part( 'components/navigation/navigation', 'top' ); ?>
-			</div><!-- .wrap -->
-		</div><!-- .navigation-top -->
+		<?php if ( has_nav_menu( 'top' ) ) : ?>
+			<div class="navigation-top">
+				<div class="wrap">
+					<?php get_template_part( 'components/navigation/navigation', 'top' ); ?>
+				</div><!-- .wrap -->
+			</div><!-- .navigation-top -->
+		<?php endif; ?>
 
 	</header><!-- #masthead -->
 
 	<?php
-	// If a regular post or page, and not the front page, show the featured image
+	// If a regular post or page, and not the front page, show the featured image.
 	if ( has_post_thumbnail() && ( is_single() || ( is_page() && ! twentyseventeen_is_frontpage() ) ) ) :
 		echo '<div class="single-featured-image-header">';
 		the_post_thumbnail( 'twentyseventeen-featured-image' );

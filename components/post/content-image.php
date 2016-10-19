@@ -12,6 +12,11 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<?php
+		if ( is_sticky() && is_home() ) :
+			echo twentyseventeen_get_svg( array( 'icon' => 'pinned' ) );
+		endif;
+	?>
 	<header class="entry-header">
 		<?php
 			if ( 'post' === get_post_type() ) :
@@ -20,6 +25,7 @@
 						twentyseventeen_posted_on();
 					else :
 						echo twentyseventeen_time_link();
+						twentyseventeen_edit_link();
 					endif;
 				echo '</div><!-- .entry-meta -->';
 			endif;
@@ -45,10 +51,10 @@
 		<?php if ( is_single() || '' === get_the_post_thumbnail() ) :
 
 			// Only show content if is a single post, or if there's no featured image.
+			/* translators: %s: Name of current post */
 			the_content( sprintf(
-				/* translators: %s: Name of current post. */
-				__( 'Continue reading %s', 'twentyseventeen' ),
-				the_title( '<span class="screen-reader-text">"', '"</span>', false )
+				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
+				get_the_title()
 			) );
 
 			wp_link_pages( array(
@@ -63,9 +69,7 @@
 	</div><!-- .entry-content -->
 
 	<?php if ( is_single() ) : ?>
-		<footer class="entry-footer">
-			<?php twentyseventeen_entry_footer(); ?>
-		</footer><!-- .entry-footer -->
+		<?php twentyseventeen_entry_footer(); ?>
 	<?php endif; ?>
 
 </article><!-- #post-## -->

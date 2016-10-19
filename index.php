@@ -16,15 +16,18 @@
  */
 
 get_header(); ?>
+
 <div class="wrap">
-	<?php
-	if ( is_home() && ! is_front_page() ) : ?>
+	<?php if ( is_home() && ! is_front_page() ) : ?>
 		<header class="page-header">
 			<h1 class="page-title"><?php single_post_title(); ?></h1>
 		</header>
-	<?php
-	endif;
-	?>
+	<?php else : ?>
+	<header class="page-header">
+		<h2 class="page-title"><?php _e( 'Posts', 'twentyseventeen' ); ?></h2>
+	</header>
+	<?php endif; ?>
+
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
 
@@ -44,19 +47,21 @@ get_header(); ?>
 				endwhile;
 
 				the_posts_pagination( array(
-					'prev_text' => '<span class="screen-reader-text">' . __( 'Previous', 'twentyseventeen' ) . '</span>',
-					'next_text' => '<span class="screen-reader-text">' . __( 'Next', 'twentyseventeen' ) . '</span>',
+					'prev_text' => twentyseventeen_get_svg( array( 'icon' => 'previous' ) ) . '<span class="screen-reader-text">' . __( 'Previous page', 'twentyseventeen' ) . '</span>',
+					'next_text' => '<span class="screen-reader-text">' . __( 'Next page', 'twentyseventeen' ) . '</span>' . twentyseventeen_get_svg( array( 'icon' => 'next' ) ),
+					'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'twentyseventeen' ) . ' </span>',
 				) );
 
 			else :
 
 				get_template_part( 'components/post/content', 'none' );
 
-			endif; ?>
+			endif;
+			?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->
 	<?php get_sidebar(); ?>
 </div><!-- .wrap -->
-<?php
-get_footer();
+
+<?php get_footer();

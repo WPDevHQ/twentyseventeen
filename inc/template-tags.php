@@ -15,12 +15,6 @@ if ( ! function_exists( 'twentyseventeen_posted_on' ) ) :
  */
 function twentyseventeen_posted_on() {
 
-	/* translators: used between list items, there is a space after the comma */
-	$separate_meta = __( ', ', 'twentyseventeen' );
-
-	// Wrap that in a link, and preface it with 'Posted on'.
-	$posted_on = '<span class="screen-reader-text">' . _x( 'Posted on', 'post date', 'twentyseventeen' ) . '</span> ' . twentyseventeen_time_link();
-
 	// Get the author name; wrap it in a link.
 	$byline = sprintf(
 		_x( 'by %s', 'post author', 'twentyseventeen' ),
@@ -28,7 +22,7 @@ function twentyseventeen_posted_on() {
 	);
 
 	// Finally, let's write all of this to the page.
-	echo '<span class="posted-on">' . $posted_on . '</span><span class="byline"> ' . $byline . '</span>'; // WPCS: XSS OK.
+	echo '<span class="posted-on">' . twentyseventeen_time_link() . '</span><span class="byline"> ' . $byline . '</span>'; // WPCS: XSS OK.
 }
 endif;
 
@@ -44,32 +38,14 @@ function twentyseventeen_time_link() {
 	}
 
 	$time_string = sprintf( $time_string,
-		get_the_date( 'c' ),
+		get_the_date( DATE_W3C ),
 		get_the_date(),
-		get_the_modified_date( 'c' ),
+		get_the_modified_date( DATE_W3C ),
 		get_the_modified_date()
 	);
 
-	return '<a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>';
-}
-endif;
-
-
-if ( ! function_exists( 'twentyseventeen_edit_post_link' ) ) :
-/**
- * Prints the post's edit link.
- */
-function twentyseventeen_edit_post_link() {
-	// Display 'edit' link.
-	edit_post_link(
-		sprintf(
-			/* translators: %s: Name of current post */
-			__( 'Edit %s', 'twentyseventeen' ),
-			the_title( '<span class="screen-reader-text">"', '"</span>', false )
-		),
-		'<span class="edit-link">',
-		'</span>'
-	);
+	// Wrap the time string in a link, and preface it with 'Posted on'.
+	return '<span class="screen-reader-text">' . _x( 'Posted on', 'post date', 'twentyseventeen' ) . '</span> <a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>';
 }
 endif;
 
@@ -83,30 +59,43 @@ function twentyseventeen_entry_footer() {
 	/* translators: used between list items, there is a space after the comma */
 	$separate_meta = __( ', ', 'twentyseventeen' );
 
-	if ( 'post' === get_post_type() ) {
-		echo '<span class="cat-tags-links">';
+	// Get Categories for posts.
+	$categories_list = get_the_category_list( $separate_meta );
 
-		// Display Categories for posts.
-		$categories_list = get_the_category_list( $separate_meta );
-		// Make sure there's more than one category before displaying.
-		if ( $categories_list && twentyseventeen_categorized_blog() ) {
-			echo '<span class="cat-links"><span class="screen-reader-text">' . __( 'Categories', 'twentyseventeen' ) . '</span>' . $categories_list . '</span>'; // WPCS: XSS OK.
-		}
+	// Get Tags for posts.
+	$tags_list = get_the_tag_list( '', $separate_meta );
 
-		// Display Tags for posts.
-		$tags_list = get_the_tag_list( '', $separate_meta );
-		if ( $tags_list ) {
-			echo '<span class="tags-links"><span class="screen-reader-text">' . __( 'Tags', 'twentyseventeen' ) . '</span>' . $tags_list . '</span>'; // WPCS: XSS OK.
-		}
+	// We don't want to output .entry-footer if it will be empty, so make sure its not.
+	if ( ( ( twentyseventeen_categorized_blog() && $categories_list ) || $tags_list ) || get_edit_post_link() ) {
 
-		echo '</span>';
+		echo '<footer class="entry-footer">';
+
+			if ( 'post' === get_post_type() ) {
+				if ( ( $categories_list && twentyseventeen_categorized_blog() ) || $tags_list ) {
+					echo '<span class="cat-tags-links">';
+
+						// Make sure there's more than one category before displaying.
+						if ( $categories_list && twentyseventeen_categorized_blog() ) {
+							echo '<span class="cat-links">' . twentyseventeen_get_svg( array( 'icon' => 'folder-open' ) ) . '<span class="screen-reader-text">' . __( 'Categories', 'twentyseventeen' ) . '</span>' . $categories_list . '</span>'; // WPCS: XSS OK.
+						}
+
+						if ( $tags_list ) {
+							echo '<span class="tags-links">' . twentyseventeen_get_svg( array( 'icon' => 'hashtag' ) ) . '<span class="screen-reader-text">' . __( 'Tags', 'twentyseventeen' ) . '</span>' . $tags_list . '</span>'; // WPCS: XSS OK.
+						}
+
+					echo '</span>';
+				}
+			}
+
+			twentyseventeen_edit_link();
+
+		echo '</footer> <!-- .entry-footer -->';
 	}
-
-	twentyseventeen_edit_post_link();
 }
 endif;
 
 
+if ( ! function_exists( 'twentyseventeen_edit_link' ) ) :
 /**
  * Returns an accessibility-friendly link to edit a post or page.
  *
@@ -114,16 +103,14 @@ endif;
  * (post or page?) so that users understand a bit more where they are in terms
  * of the template hierarchy and their content. Helpful when/if the single-page
  * layout with multiple posts/pages shown gets confusing.
- *
- * @param int $id The post ID.
  */
-function twentyseventeen_edit_link( $id ) {
+function twentyseventeen_edit_link() {
 
 	$link = edit_post_link(
 		sprintf(
 			/* translators: %s: Name of current post */
-			__( 'Edit %s', 'twentyseventeen' ),
-			the_title( '<span class="screen-reader-text">"', '"</span>', false )
+			__( 'Edit<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
+			get_the_title()
 		),
 		'<span class="edit-link">',
 		'</span>'
@@ -131,6 +118,7 @@ function twentyseventeen_edit_link( $id ) {
 
 	return $link;
 }
+endif;
 
 
 /**
@@ -139,9 +127,11 @@ function twentyseventeen_edit_link( $id ) {
  * @return bool
  */
 function twentyseventeen_categorized_blog() {
-	if ( false === ( $all_the_cool_cats = get_transient( 'twentyseventeen_categories' ) ) ) {
+	$category_count = get_transient( 'twentyseventeen_categories' );
+
+	if ( false === $category_count ) {
 		// Create an array of all the categories that are attached to posts.
-		$all_the_cool_cats = get_categories( array(
+		$categories = get_categories( array(
 			'fields'     => 'ids',
 			'hide_empty' => 1,
 			// We only need to know if there is more than one category.
@@ -149,18 +139,12 @@ function twentyseventeen_categorized_blog() {
 		) );
 
 		// Count the number of categories that are attached to the posts.
-		$all_the_cool_cats = count( $all_the_cool_cats );
+		$category_count = count( $categories );
 
-		set_transient( 'twentyseventeen_categories', $all_the_cool_cats );
+		set_transient( 'twentyseventeen_categories', $category_count );
 	}
 
-	if ( $all_the_cool_cats > 1 ) {
-		// This blog has more than 1 category so twentyseventeen_categorized_blog should return true.
-		return true;
-	}
-
-	// This blog has only 1 category so twentyseventeen_categorized_blog should return false.
-	return false;
+	return $category_count > 1;
 }
 
 

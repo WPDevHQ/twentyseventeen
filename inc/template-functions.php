@@ -1,8 +1,6 @@
 <?php
 /**
- * Custom functions that act independently of the theme templates
- *
- * Eventually, some of the functionality here could be replaced by core features.
+ * Additional features to allow styling of the templates
  *
  * @package WordPress
  * @subpackage Twenty_Seventeen
@@ -36,9 +34,9 @@ function twentyseventeen_body_classes( $classes ) {
 		$classes[] = 'twentyseventeen-front-page';
 	}
 
-	// Add class if no custom header or featured images.
-	if ( ! has_header_image() && ( ! has_post_thumbnail() || is_home() ) ) {
-		$classes[] = 'no-header-image';
+	// Add a class if there is a featured image or custom header.
+	if ( has_header_image() || ( has_post_thumbnail() && twentyseventeen_is_frontpage() ) ) {
+		$classes[] = 'has-header-image';
 	}
 
 	// Add class if sidebar is used.
@@ -47,13 +45,22 @@ function twentyseventeen_body_classes( $classes ) {
 	}
 
 	// Add class for one or two column page layouts.
-	if ( is_page() && ! twentyseventeen_is_frontpage() && ! is_home() ) {
+	if ( is_page() ) {
 		if ( 'one-column' === get_theme_mod( 'page_options' ) ) {
 			$classes[] = 'page-one-column';
 		} else {
 			$classes[] = 'page-two-column';
 		}
 	}
+
+	// Add class if the site title and tagline is hidden.
+	if ( 'blank' === get_header_textcolor() ) {
+		$classes[] = 'title-tagline-hidden';
+	}
+
+	// Get the colorscheme or the default if there isn't one.
+	$colors = twentyseventeen_sanitize_colorscheme( get_theme_mod( 'colorscheme', 'light' ) );
+	$classes[] = 'colors-' . $colors;
 
 	return $classes;
 }
@@ -81,19 +88,12 @@ function twentyseventeen_panel_count() {
  * Checks to see if we're on the homepage or not.
  */
 function twentyseventeen_is_frontpage() {
-	if ( is_front_page() && ! is_home() ) {
-		return true;
-	}
-
-	return false;
+	return ( is_front_page() && ! is_home() );
 }
 
 /**
- * Add a pingback url auto-discovery header for singularly identifiable articles.
+ * Custom Active Callback to check for page.
  */
-function twentyseventeen_pingback_header() {
-	if ( is_singular() && pings_open() ) {
-		printf( '<link rel="pingback" href="%s">' . "\n", get_bloginfo( 'pingback_url' ) );
-	}
+function twentyseventeen_is_page() {
+	return ( is_page() );
 }
-add_action( 'wp_head', 'twentyseventeen_pingback_header' );

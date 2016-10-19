@@ -11,6 +11,7 @@
  */
 
 get_header(); ?>
+
 <div class="wrap">
 
 	<header class="page-header">
@@ -36,11 +37,12 @@ get_header(); ?>
 				 */
 				get_template_part( 'components/post/content', 'excerpt' );
 
-			endwhile;
+			endwhile; // End of the loop.
 
 			the_posts_pagination( array(
-				'prev_text' => '<span class="screen-reader-text">' . __( 'Previous', 'twentyseventeen' ) . '</span>',
-				'next_text' => '<span class="screen-reader-text">' . __( 'Next', 'twentyseventeen' ) . '</span>',
+				'prev_text' => twentyseventeen_get_svg( array( 'icon' => 'previous' ) ) . '<span class="screen-reader-text">' . __( 'Previous page', 'twentyseventeen' ) . '</span>',
+				'next_text' => '<span class="screen-reader-text">' . __( 'Next page', 'twentyseventeen' ) . '</span>' . twentyseventeen_get_svg( array( 'icon' => 'next' ) ),
+				'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'twentyseventeen' ) . ' </span>',
 			) );
 
 		else : ?>
@@ -49,11 +51,12 @@ get_header(); ?>
 			<?php
 				get_search_form();
 
-		endif; ?>
+		endif;
+		?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->
 	<?php get_sidebar(); ?>
 </div><!-- .wrap -->
-<?php
-get_footer();
+
+<?php get_footer();

@@ -12,6 +12,11 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<?php
+		if ( is_sticky() && is_home() ) :
+			echo twentyseventeen_get_svg( array( 'icon' => 'pinned' ) );
+		endif;
+	?>
 	<header class="entry-header">
 		<?php
 			if ( 'post' === get_post_type() ) :
@@ -20,6 +25,7 @@
 						twentyseventeen_posted_on();
 					else :
 						echo twentyseventeen_time_link();
+						twentyseventeen_edit_link();
 					endif;
 				echo '</div><!-- .entry-meta -->';
 			endif;
@@ -32,7 +38,7 @@
 		?>
 	</header><!-- .entry-header -->
 
-	<?php if ( '' !== get_the_post_thumbnail() && ! is_single() ) : ?>
+	<?php if ( '' !== get_the_post_thumbnail() && ! is_single() && ! get_post_gallery() ) : ?>
 		<div class="post-thumbnail">
 			<a href="<?php the_permalink(); ?>">
 				<?php the_post_thumbnail( 'twentyseventeen-featured-image' ); ?>
@@ -44,9 +50,7 @@
 
 		<?php if ( ! is_single() ) :
 
-			// If not a single post, highlight the gallery
-			$content = apply_filters( 'the_content', get_the_content() );
-
+			// If not a single post, highlight the gallery.
 			if ( get_post_gallery() ) :
 				echo '<div class="entry-gallery">';
 					echo get_post_gallery();
@@ -57,10 +61,10 @@
 
 		if ( is_single() || ! get_post_gallery() ) :
 
+			/* translators: %s: Name of current post */
 			the_content( sprintf(
-				/* translators: %s: Name of current post. */
-				__( 'Continue reading %s', 'twentyseventeen' ),
-				the_title( '<span class="screen-reader-text">"', '"</span>', false )
+				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
+				get_the_title()
 			) );
 
 			wp_link_pages( array(
@@ -75,9 +79,7 @@
 	</div><!-- .entry-content -->
 
 	<?php if ( is_single() ) : ?>
-		<footer class="entry-footer">
-			<?php twentyseventeen_entry_footer(); ?>
-		</footer><!-- .entry-footer -->
+		<?php twentyseventeen_entry_footer(); ?>
 	<?php endif; ?>
 
 </article><!-- #post-## -->

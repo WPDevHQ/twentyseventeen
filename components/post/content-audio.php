@@ -9,9 +9,15 @@
  * @since 1.0
  * @version 1.0
  */
+
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<?php
+		if ( is_sticky() && is_home() ) :
+			echo twentyseventeen_get_svg( array( 'icon' => 'pinned' ) );
+		endif;
+	?>
 	<header class="entry-header">
 		<?php
 			if ( 'post' === get_post_type() ) :
@@ -20,6 +26,7 @@
 						twentyseventeen_posted_on();
 					else :
 						echo twentyseventeen_time_link();
+						twentyseventeen_edit_link();
 					endif;
 				echo '</div><!-- .entry-meta -->';
 			endif;
@@ -31,6 +38,11 @@
 			}
 		?>
 	</header><!-- .entry-header -->
+
+	<?php
+		$content = apply_filters( 'the_content', get_the_content() );
+		$audio = get_media_embedded_in_content( $content, array( 'audio' ) );
+	?>
 
 	<?php if ( '' !== get_the_post_thumbnail() && ! is_single() ) : ?>
 		<div class="post-thumbnail">
@@ -44,10 +56,7 @@
 
 		<?php if ( ! is_single() ) :
 
-			// If not a single post, highlight the audio file
-			$content = apply_filters( 'the_content', get_the_content() );
-			$audio = get_media_embedded_in_content( $content, array( 'audio' ) );
-
+			// If not a single post, highlight the audio file.
 			if ( ! empty( $audio ) ) :
 				foreach ( $audio as $audio_html ) {
 					echo '<div class="entry-audio">';
@@ -60,10 +69,10 @@
 
 		if ( is_single() || empty( $audio ) ) :
 
+			/* translators: %s: Name of current post */
 			the_content( sprintf(
-				/* translators: %s: Name of current post. */
-				__( 'Continue reading %s', 'twentyseventeen' ),
-				the_title( '<span class="screen-reader-text">"', '"</span>', false )
+				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
+				get_the_title()
 			) );
 
 			wp_link_pages( array(
@@ -78,9 +87,7 @@
 	</div><!-- .entry-content -->
 
 	<?php if ( is_single() ) : ?>
-		<footer class="entry-footer">
-			<?php twentyseventeen_entry_footer(); ?>
-		</footer><!-- .entry-footer -->
+		<?php twentyseventeen_entry_footer(); ?>
 	<?php endif; ?>
 
 </article><!-- #post-## -->

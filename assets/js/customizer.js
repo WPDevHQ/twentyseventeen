@@ -51,6 +51,7 @@
 					'clip': 'rect(1px, 1px, 1px, 1px)',
 					'position': 'absolute'
 				} );
+				$( 'body' ).addClass( 'title-tagline-hidden' );
 			} else {
 				$( '.site-title, .site-description' ).css( {
 					'clip': 'auto',
@@ -59,6 +60,43 @@
 				$( '.site-branding, .site-branding a, .site-description, .site-description a' ).css( {
 					'color': to
 				} );
+				$( 'body' ).removeClass( 'title-tagline-hidden' );
+			}
+		} );
+	} );
+
+	// Color scheme.
+	wp.customize( 'colorscheme', function( value ) {
+		value.bind( function( to ) {
+
+			// Update color body class.
+			$( 'body' ).removeClass( 'colors-light colors-dark colors-custom' )
+				.addClass( 'colors-' + to );
+		} );
+	} );
+
+	// Custom color hue.
+	wp.customize( 'colorscheme_hue', function( value ) {
+		value.bind( function( to ) {
+
+			// Update custom color CSS
+			var style = $( '#custom-theme-colors' ),
+			    hue = style.data( 'hue' ),
+			    css = style.html();
+
+			css = css.split( hue + ',' ).join( to + ',' ); // Equivalent to css.replaceAll, with hue followed by comma to prevent values with units from being changed.
+			style.html( css )
+			     .data( 'hue', to );
+		} );
+	} );
+
+	// Page layouts.
+	wp.customize( 'page_options', function( value ) {
+		value.bind( function( to ) {
+			if ( 'one-column' === to ) {
+				$( 'body' ).addClass( 'page-one-column' ).removeClass( 'page-two-column' );
+			} else {
+				$( 'body' ).removeClass( 'page-one-column' ).addClass( 'page-two-column' );
 			}
 		} );
 	} );

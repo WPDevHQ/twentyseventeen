@@ -16,8 +16,8 @@
  */
 function twentyseventeen_custom_header_setup() {
 	add_theme_support( 'custom-header', apply_filters( 'twentyseventeen_custom_header_args', array(
-		'default-image'      => get_template_directory_uri() . '/assets/images/header.jpg',
-		'default-text-color' => '222222',
+		'default-image'      => get_parent_theme_file_uri( '/assets/images/header.jpg' ),
+		'default-text-color' => 'ffffff',
 		'width'              => 2000,
 		'height'             => 1200,
 		'flex-height'        => true,
@@ -36,14 +36,14 @@ add_action( 'after_setup_theme', 'twentyseventeen_custom_header_setup' );
 
 if ( ! function_exists( 'twentyseventeen_header_style' ) ) :
 /**
- * Styles the header image and text displayed on the blog
+ * Styles the header image and text displayed on the blog.
  *
  * @see twentyseventeen_custom_header_setup().
  */
 function twentyseventeen_header_style() {
 	$header_text_color = get_header_textcolor();
 
-	// If no custom options for text are set, let's bail
+	// If no custom options for text are set, let's bail.
 	// get_header_textcolor() options: add_theme_support( 'custom-header' ) is default, hide text (returns 'blank') or any hex value.
 	if ( get_theme_support( 'custom-header', 'default-text-color' ) === $header_text_color ) {
 		return;
